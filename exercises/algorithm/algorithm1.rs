@@ -2,8 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
-
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
@@ -69,15 +67,43 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+	pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self
+where
+    T: Ord + Clone,  // 需要 T 实现 Ord 和 Clone traits
+{
+    let mut result = LinkedList::new();
+    
+    // 将两个链表的值收集到向量中
+    let mut values = Vec::new();
+    
+    // 收集 list_a 的值
+    let mut current = list_a.start;
+    while let Some(node_ptr) = current {
+        unsafe {
+            values.push((*node_ptr.as_ptr()).val.clone());
+            current = (*node_ptr.as_ptr()).next;
         }
-	}
+    }
+    
+    // 收集 list_b 的值
+    let mut current = list_b.start;
+    while let Some(node_ptr) = current {
+        unsafe {
+            values.push((*node_ptr.as_ptr()).val.clone());
+            current = (*node_ptr.as_ptr()).next;
+        }
+    }
+    
+    // 排序值
+    values.sort();
+    
+    // 构建新的链表
+    for value in values {
+        result.add(value);
+    }
+    
+    result
+}
 }
 
 impl<T> Display for LinkedList<T>

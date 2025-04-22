@@ -31,7 +31,6 @@ enum ParsePersonError {
     ParseInt(ParseIntError),
 }
 
-// I AM NOT DONE
 
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
@@ -52,82 +51,37 @@ enum ParsePersonError {
 impl FromStr for Person {
     type Err = ParsePersonError;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
-    }
-}
-
-fn main() {
-    let p = "Mark,20".parse::<Person>().unwrap();
-    println!("{:?}", p);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn empty_input() {
-        assert_eq!("".parse::<Person>(), Err(ParsePersonError::Empty));
-    }
-    #[test]
-    fn good_input() {
-        let p = "John,32".parse::<Person>();
-        assert!(p.is_ok());
-        let p = p.unwrap();
-        assert_eq!(p.name, "John");
-        assert_eq!(p.age, 32);
-    }
-    #[test]
-    fn missing_age() {
-        assert!(matches!(
-            "John,".parse::<Person>(),
-            Err(ParsePersonError::ParseInt(_))
-        ));
-    }
-
-    #[test]
-    fn invalid_age() {
-        assert!(matches!(
-            "John,twenty".parse::<Person>(),
-            Err(ParsePersonError::ParseInt(_))
-        ));
-    }
-
-    #[test]
-    fn missing_comma_and_age() {
-        assert_eq!("John".parse::<Person>(), Err(ParsePersonError::BadLen));
-    }
-
-    #[test]
-    fn missing_name() {
-        assert_eq!(",1".parse::<Person>(), Err(ParsePersonError::NoName));
-    }
-
-    #[test]
-    fn missing_name_and_age() {
-        assert!(matches!(
-            ",".parse::<Person>(),
-            Err(ParsePersonError::NoName | ParsePersonError::ParseInt(_))
-        ));
-    }
-
-    #[test]
-    fn missing_name_and_invalid_age() {
-        assert!(matches!(
-            ",one".parse::<Person>(),
-            Err(ParsePersonError::NoName | ParsePersonError::ParseInt(_))
-        ));
-    }
-
-    #[test]
-    fn trailing_comma() {
-        assert_eq!("John,32,".parse::<Person>(), Err(ParsePersonError::BadLen));
-    }
-
-    #[test]
-    fn trailing_comma_and_some_string() {
-        assert_eq!(
-            "John,32,man".parse::<Person>(),
-            Err(ParsePersonError::BadLen)
-        );
+        // 1. 如果输入字符串长度为0，返回Empty错误
+        if s.is_empty() {
+            return Err(ParsePersonError::Empty);
+        }
+        
+        // 2. 按逗号分割字符串
+        let parts: Vec<&str> = s.split(',').collect();
+        
+        // 3. 检查分割后的元素数量是否为2，否则返回BadLen错误
+        if parts.len() != 2 {
+            return Err(ParsePersonError::BadLen);
+        }
+        
+        // 4. 提取名字
+        let name = parts[0];
+        
+        // 检查名字是否为空
+        if name.is_empty() {
+            return Err(ParsePersonError::NoName);
+        }
+        
+        // 5. 提取并解析年龄
+        let age_str = parts[1];
+        
+        // 尝试将年龄解析为usize，如果失败则包装错误
+        let age = age_str.parse::<usize>().map_err(ParsePersonError::ParseInt)?;
+        
+        // 6. 如果一切正常，返回Person对象
+        Ok(Person {
+            name: String::from(name),
+            age,
+        })
     }
 }

@@ -2,7 +2,6 @@
 	double linked list reverse
 	This problem requires you to reverse a doubly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -72,9 +71,46 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn reverse(&mut self){
-		// TODO
-	}
+    pub fn reverse(&mut self) {
+        // 如果链表为空或只有一个节点，不需要反转
+        if self.length <= 1 {
+            return;
+        }
+    
+        // 从头节点开始遍历
+        let mut current = self.start;
+        
+        // 临时变量，用于在交换过程中保存下一个节点
+        let mut next;
+        
+        // 遍历链表，交换每个节点的 prev 和 next 指针
+        while let Some(current_ptr) = current {
+            // 保存下一个节点的引用，因为我们将要改变 current.next
+            next = unsafe { (*current_ptr.as_ptr()).next };
+            
+            // 交换当前节点的 prev 和 next 指针
+            unsafe {
+                let temp = (*current_ptr.as_ptr()).prev;
+                (*current_ptr.as_ptr()).prev = (*current_ptr.as_ptr()).next;
+                (*current_ptr.as_ptr()).next = temp;
+            }
+            
+            // 如果没有下一个节点了，说明当前节点是原链表的最后一个节点
+            // 现在它将成为反转后链表的第一个节点
+            if next.is_none() {
+                self.start = Some(current_ptr);
+            }
+            
+            // 如果没有前一个节点了，说明当前节点是原链表的第一个节点
+            // 现在它将成为反转后链表的最后一个节点
+            if unsafe { (*current_ptr.as_ptr()).next.is_none() } {
+                self.end = Some(current_ptr);
+            }
+            
+            // 移动到下一个节点
+            current = next;
+        }
+    }
 }
 
 impl<T> Display for LinkedList<T>

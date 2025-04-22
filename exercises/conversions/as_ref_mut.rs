@@ -7,25 +7,27 @@
 // Execute `rustlings hint as_ref_mut` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
 // Obtain the number of bytes (not characters) in the given argument.
 // TODO: Add the AsRef trait appropriately as a trait bound.
-fn byte_counter<T>(arg: T) -> usize {
+// Obtain the number of bytes (not characters) in the given argument.
+// 添加 AsRef<str> trait 约束，使参数可以被转换为 &str 引用
+fn byte_counter<T: AsRef<str>>(arg: T) -> usize {
     arg.as_ref().as_bytes().len()
 }
 
 // Obtain the number of characters (not bytes) in the given argument.
-// TODO: Add the AsRef trait appropriately as a trait bound.
-fn char_counter<T>(arg: T) -> usize {
+// 同样添加 AsRef<str> trait 约束
+fn char_counter<T: AsRef<str>>(arg: T) -> usize {
     arg.as_ref().chars().count()
 }
 
 // Squares a number using as_mut().
-// TODO: Add the appropriate trait bound.
-fn num_sq<T>(arg: &mut T) {
-    // TODO: Implement the function body.
-    ???
+// 添加 AsMut<u32> trait 约束，使参数可以被转换为 &mut u32 引用
+fn num_sq<T: AsMut<u32>>(arg: &mut T) {
+    // 实现函数体：获取可变引用并平方
+    let value = arg.as_mut();
+    *value = *value * *value;
 }
 
 #[cfg(test)]
